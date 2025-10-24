@@ -3,6 +3,22 @@
 ## CONTEXT
 You are building a working MVP demo for The Architect track competition. You have **2.5 hours**. The demo must be publicly accessible and fully functional. Judges evaluate: working demo quality, visual polish, feature completeness, technical depth, and speed of execution.
 
+## CONTEXT7 INTEGRATION
+This project has **Context7 MCP** configured for real-time documentation access.
+
+**When to use Context7:**
+- ✅ **Domain-specific customizations** - "Show me a ride-sharing checkout flow with shadcn/ui"
+- ✅ **Beyond the 8 patterns** - Need something not in pre-built patterns
+- ✅ **Troubleshooting** - Debug errors or API issues
+- ✅ **Latest features** - Check if new components/APIs are available
+
+**When to use Pre-built Patterns (FASTER):**
+- ⚡ **Standard layouts** - Navigation, Hero, Cards, Forms, Modals
+- ⚡ **Proven speed** - Copy-paste patterns save 5-10 minutes each
+- ⚡ **Time pressure** - Under 60 minutes left, stick to patterns
+
+**Strategy:** Start with patterns, use Context7 for challenge-specific features.
+
 ## CRITICAL RULES
 1. **Deploy first, deploy often** - Get a live URL within 15 minutes
 2. **Production over perfection** - Working demo on live URL beats perfect localhost
@@ -808,6 +824,8 @@ If the challenge has a special requirement (like "surge pricing" or "real-time n
 - Add a toggle or demo button
 - Document it clearly in your README
 
+**💡 Context7 Tip:** For domain-specific features, ask: "use context7 - Show me how to implement [specific feature] with React and shadcn/ui" to get tailored examples beyond the standard patterns.
+
 Example:
 ```jsx
 <Card className="p-6 mb-6 bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
@@ -1121,12 +1139,13 @@ Built in 2.5 hours for the AI Prompt Championship 🚀
 
 1. [ ] Test your laptop, internet, and development setup
 2. [ ] Verify you can deploy to Vercel (test with dummy project)
-3. [ ] Have this prompt ready to paste into Claude
-4. [ ] Create GitHub repo in advance (save 2 minutes)
-5. [ ] Connect Vercel to GitHub (save 3 minutes)
-6. [ ] Open VS Code, terminal, browser tabs
-7. [ ] Log into Vercel, GitHub
-8. [ ] Have Unsplash open for images
+3. [ ] Verify Context7 MCP is working: `claude mcp list` (should show ✓ Connected)
+4. [ ] Have this prompt ready to paste into Claude
+5. [ ] Create GitHub repo in advance (save 2 minutes)
+6. [ ] Connect Vercel to GitHub (save 3 minutes)
+7. [ ] Open VS Code, terminal, browser tabs
+8. [ ] Log into Vercel, GitHub
+9. [ ] Have Unsplash open for images
 
 **When challenge drops:**
 
