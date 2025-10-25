@@ -179,7 +179,7 @@ export default function LunarLander() {
       }).setOrigin(0.5, 0);
 
       // Instructions
-      const instructions = this.add.text(400, 300, 'Arrow Keys: Thrust\n\nLand softly on the gold pad!\n\nSpeed < 50 to survive', {
+      const instructions = this.add.text(400, 300, 'Arrow Keys: Thrust\n\nLand softly on the gold pad!\n\nSpeed < 80 to survive', {
         fontSize: '20px',
         fill: '#FFD700',
         align: 'center',
@@ -477,8 +477,10 @@ export default function LunarLander() {
         lander.body.velocity.x ** 2 + lander.body.velocity.y ** 2
       );
 
-      // Successful landing criteria
-      if (speed < 50 && Math.abs(lander.rotation) < 0.3) {
+      console.log('Landing detected! Speed:', speed, 'Rotation:', lander.rotation);
+
+      // Successful landing criteria (more lenient)
+      if (speed < 80 && Math.abs(lander.rotation) < 0.5) {
         gameWon = true;
         lander.setVelocity(0, 0);
         this.physics.pause();
@@ -513,9 +515,9 @@ export default function LunarLander() {
         this.input.once('pointerdown', () => {
           this.scene.restart();
         });
-      } else if (speed >= 50) {
+      } else if (speed >= 80) {
         crashLander.call(this, 'TOO FAST! Speed: ' + Math.round(speed));
-      } else if (Math.abs(lander.rotation) >= 0.3) {
+      } else if (Math.abs(lander.rotation) >= 0.5) {
         crashLander.call(this, 'BAD ANGLE!');
       }
     }
