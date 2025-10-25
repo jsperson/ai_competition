@@ -95,7 +95,7 @@ export default function LunarLander() {
       }).setOrigin(0.5);
 
       // Landing pad (on blue dome - Century 2)
-      const padX = 200;
+      const padX = 280;
       const padY = 565;
       const padWidth = 50;
 
