@@ -21,7 +21,7 @@ export default function LunarLander() {
       physics: {
         default: 'arcade',
         arcade: {
-          gravity: { y: 400 }, // Strong gravity for challenging gameplay
+          gravity: { y: 280 }, // Balanced gravity - challenging but playable
           debug: false
         }
       },
