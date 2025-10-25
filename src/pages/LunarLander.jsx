@@ -49,6 +49,13 @@ export default function LunarLander() {
 
     // ========== CREATE ==========
     function create() {
+      // Reset game state on restart
+      fuel = 100;
+      gameOver = false;
+      gameWon = false;
+      score = 0;
+      fuelWarning = false;
+
       // Create textures
       createTextures.call(this);
 
