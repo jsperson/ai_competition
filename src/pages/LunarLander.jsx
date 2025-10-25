@@ -90,7 +90,7 @@ export default function LunarLander() {
 
       // Landing pad (on blue dome - Century 2)
       const padX = 200;
-      const padY = 435;
+      const padY = 565;
       const padWidth = 50;
 
       landingPad = this.add.rectangle(padX, padY, padWidth, 10, 0xFFD700);
@@ -106,9 +106,9 @@ export default function LunarLander() {
       // Ground collision body (invisible, covers entire bottom except blue dome)
       ground = this.physics.add.staticGroup();
       // Left side of ground (before dome)
-      ground.create(75, 500, null).setSize(150, 200).setVisible(false);
+      ground.create(75, 580, null).setSize(150, 40).setVisible(false);
       // Right side of ground (after dome)
-      ground.create(500, 500, null).setSize(600, 200).setVisible(false);
+      ground.create(500, 580, null).setSize(600, 40).setVisible(false);
 
       // Lander starting position (randomized across top)
       const startX = Phaser.Math.Between(100, 700);
@@ -446,7 +446,7 @@ export default function LunarLander() {
         velocityText.setColor('#FFD700');
       }
 
-      const altitude = Math.max(0, 520 - lander.y);
+      const altitude = Math.max(0, 565 - lander.y);
       altitudeText.setText('Alt: ' + Math.round(altitude) + 'm');
 
       // Rotate lander based on horizontal velocity
@@ -492,7 +492,7 @@ export default function LunarLander() {
         }).setOrigin(0.5);
 
         // Celebration particles
-        const celebration = this.add.particles(400, 520, 'particle', {
+        const celebration = this.add.particles(padX, padY, 'particle', {
           speed: { min: 100, max: 200 },
           angle: { min: 260, max: 280 },
           scale: { start: 1, end: 0 },
