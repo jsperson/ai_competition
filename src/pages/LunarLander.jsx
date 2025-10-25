@@ -21,7 +21,7 @@ export default function LunarLander() {
       physics: {
         default: 'arcade',
         arcade: {
-          gravity: { y: 100 }, // Moon gravity (lower than Earth)
+          gravity: { y: 200 }, // Increased gravity for better gameplay
           debug: false
         }
       },
@@ -91,6 +91,7 @@ export default function LunarLander() {
       lander.setCollideWorldBounds(true);
       lander.setDamping(true);
       lander.setDrag(0.05); // Light drag for realistic space physics
+      lander.setMaxVelocity(800, 800); // Allow high speeds
 
       // Lander collision
       this.physics.add.overlap(lander, landingPad, checkLanding, null, this);
