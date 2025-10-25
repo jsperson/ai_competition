@@ -26,6 +26,7 @@ export default function LunarLander() {
         }
       },
       scene: {
+        preload: preload,
         create: create,
         update: update
       }
@@ -47,6 +48,11 @@ export default function LunarLander() {
     let fuelWarning = false;
     let ground;
 
+    // ========== PRELOAD ==========
+    function preload() {
+      this.load.image('wichita-bg', '/wichita_lunar_lander_bg_1.jpg');
+    }
+
     // ========== CREATE ==========
     function create() {
       // Reset game state on restart
@@ -59,19 +65,32 @@ export default function LunarLander() {
       // Create textures
       createTextures.call(this);
 
-      // Stars background
-      createStarfield.call(this);
+      // Wichita background image
+      const bg = this.add.image(400, 300, 'wichita-bg');
+      bg.setDisplaySize(800, 600);
+
+      // Stars background overlay (with transparency)
+      for (let i = 0; i < 100; i++) {
+        const x = Phaser.Math.Between(0, 800);
+        const y = Phaser.Math.Between(0, 300);
+        const star = this.add.circle(x, y, 1, 0xFFFFFF, 0.6);
+
+        this.tweens.add({
+          targets: star,
+          alpha: 0.2,
+          duration: Phaser.Math.Between(1000, 3000),
+          yoyo: true,
+          repeat: -1
+        });
+      }
 
       // Moon surface at top
       createMoonSurface.call(this);
 
-      // Wichita skyline at bottom
-      createWichitaSkyline.call(this);
-
-      // Landing pad (small and precise)
-      const padX = 400;
-      const padY = 520;
-      const padWidth = 60;
+      // Landing pad (on blue dome - Century 2)
+      const padX = 200;
+      const padY = 435;
+      const padWidth = 50;
 
       landingPad = this.add.rectangle(padX, padY, padWidth, 10, 0xFFD700);
       this.physics.add.existing(landingPad, true);
@@ -83,12 +102,12 @@ export default function LunarLander() {
         fontStyle: 'bold'
       }).setOrigin(0.5);
 
-      // Ground collision body (invisible, covers entire bottom except landing pad area)
+      // Ground collision body (invisible, covers entire bottom except blue dome)
       ground = this.physics.add.staticGroup();
-      // Left side of ground
-      ground.create(200, 540, null).setSize(400, 20).setVisible(false);
-      // Right side of ground
-      ground.create(600, 540, null).setSize(400, 20).setVisible(false);
+      // Left side of ground (before dome)
+      ground.create(75, 500, null).setSize(150, 200).setVisible(false);
+      // Right side of ground (after dome)
+      ground.create(500, 500, null).setSize(600, 200).setVisible(false);
 
       // Lander starting position (randomized across top)
       const startX = Phaser.Math.Between(100, 700);
