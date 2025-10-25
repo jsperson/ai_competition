@@ -45,6 +45,7 @@ export default function LunarLander() {
     let landingPad;
     let thrustParticles;
     let fuelWarning = false;
+    let ground;
 
     // ========== CREATE ==========
     function create() {
@@ -75,8 +76,16 @@ export default function LunarLander() {
         fontStyle: 'bold'
       }).setOrigin(0.5);
 
-      // Lander starting position (on moon)
-      lander = this.physics.add.sprite(400, 60, 'lander');
+      // Ground collision body (invisible, covers entire bottom except landing pad area)
+      ground = this.physics.add.staticGroup();
+      // Left side of ground
+      ground.create(200, 540, null).setSize(400, 20).setVisible(false);
+      // Right side of ground
+      ground.create(600, 540, null).setSize(400, 20).setVisible(false);
+
+      // Lander starting position (randomized across top)
+      const startX = Phaser.Math.Between(100, 700);
+      lander = this.physics.add.sprite(startX, 60, 'lander');
       lander.setTint(0xFFD700); // Kansas Gold
       lander.setScale(1.2);
       lander.setCollideWorldBounds(true);
@@ -85,6 +94,7 @@ export default function LunarLander() {
 
       // Lander collision
       this.physics.add.overlap(lander, landingPad, checkLanding, null, this);
+      this.physics.add.collider(lander, ground, crashOnGround, null, this);
 
       // Thrust particles
       thrustParticles = this.add.particles(0, 0, 'particle', {
@@ -361,14 +371,16 @@ export default function LunarLander() {
 
       // Rotate lander based on horizontal velocity
       lander.rotation = lander.body.velocity.x * 0.01;
+    }
 
-      // Check if crashed (hit ground outside landing pad)
-      if (lander.y > 515 && !Phaser.Geom.Intersects.RectangleToRectangle(
-        lander.getBounds(),
-        landingPad.getBounds()
-      )) {
-        crashLander.call(this);
-      }
+    function crashOnGround() {
+      if (gameOver || gameWon) return;
+
+      const speed = Math.sqrt(
+        lander.body.velocity.x ** 2 + lander.body.velocity.y ** 2
+      );
+
+      crashLander.call(this, 'CRASHED INTO GROUND!\nSpeed: ' + Math.round(speed));
     }
 
     function checkLanding(lander, pad) {
