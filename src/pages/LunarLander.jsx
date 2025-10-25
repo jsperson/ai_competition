@@ -68,11 +68,8 @@ export default function LunarLander() {
       // Wichita background image (positioned so skyline is at bottom)
       const bg = this.add.image(400, 600, 'wichita-bg');
       bg.setOrigin(0.5, 1); // Anchor to bottom center
-      // Scale to make image taller so skyline fills bottom
-      const bgAspect = bg.width / bg.height;
-      const targetWidth = 800;
-      const targetHeight = targetWidth / bgAspect;
-      bg.setDisplaySize(targetWidth, targetHeight);
+      // Make image much taller to ensure skyline is at canvas bottom
+      bg.setDisplaySize(800, 900);
 
       // Stars background overlay (with transparency)
       for (let i = 0; i < 100; i++) {
