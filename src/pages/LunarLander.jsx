@@ -68,12 +68,16 @@ export default function LunarLander() {
       // Wichita background image (positioned so skyline is at bottom)
       const bg = this.add.image(400, 600, 'wichita-bg');
       bg.setOrigin(0.5, 1); // Anchor to bottom center
-      bg.setDisplaySize(800, 600);
+      // Scale to make image taller so skyline fills bottom
+      const bgAspect = bg.width / bg.height;
+      const targetWidth = 800;
+      const targetHeight = targetWidth / bgAspect;
+      bg.setDisplaySize(targetWidth, targetHeight);
 
       // Stars background overlay (with transparency)
       for (let i = 0; i < 100; i++) {
         const x = Phaser.Math.Between(0, 800);
-        const y = Phaser.Math.Between(0, 300);
+        const y = Phaser.Math.Between(0, 200);
         const star = this.add.circle(x, y, 1, 0xFFFFFF, 0.6);
 
         this.tweens.add({
@@ -85,8 +89,13 @@ export default function LunarLander() {
         });
       }
 
-      // Moon surface at top
-      createMoonSurface.call(this);
+      // Moon surface at top (simple gray bar)
+      const moonSurface = this.add.rectangle(400, 15, 800, 30, 0x888888);
+      this.add.text(400, 15, '🌙 LUNAR SURFACE', {
+        fontSize: '14px',
+        fill: '#FFD700',
+        fontStyle: 'bold'
+      }).setOrigin(0.5);
 
       // Landing pad (on blue dome - Century 2)
       const padX = 200;
