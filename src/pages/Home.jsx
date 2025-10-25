@@ -12,11 +12,14 @@ export default function Home() {
       <nav className="bg-blue-950/80 backdrop-blur-sm sticky top-0 z-50 border-b border-yellow-500/30">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <h1 className="text-2xl font-bold text-yellow-400">Kansas Web Games</h1>
-          <div className="flex gap-3">
-            <Button variant="ghost" className="text-yellow-400 hover:bg-yellow-400/20 border border-yellow-400/30" onClick={() => navigate('/game')}>
+          <div className="flex gap-2">
+            <Button variant="ghost" className="text-yellow-400 hover:bg-yellow-400/20 border border-yellow-400/30 text-sm" onClick={() => navigate('/game')}>
               Space Shooter
             </Button>
-            <Button className="bg-yellow-400 text-blue-950 hover:bg-yellow-300 font-bold" onClick={() => navigate('/wichita-moonbase')}>
+            <Button variant="ghost" className="text-yellow-400 hover:bg-yellow-400/20 border border-yellow-400/30 text-sm" onClick={() => navigate('/lunar-lander')}>
+              🚀 Lunar Lander
+            </Button>
+            <Button className="bg-yellow-400 text-blue-950 hover:bg-yellow-300 font-bold text-sm" onClick={() => navigate('/wichita-moonbase')}>
               🛡️ Defend Wichita
             </Button>
           </div>
@@ -50,6 +53,14 @@ export default function Home() {
             Powered by Phaser 3, React, and Vite - Navy Blue Pride, Gold Determination
           </p>
           <div className="flex gap-4 justify-center">
+            <Button
+              size="lg"
+              variant="outline"
+              className="bg-yellow-400/10 text-yellow-400 border-yellow-400/50 hover:bg-yellow-400/20 text-base px-6 py-3"
+              onClick={() => navigate('/lunar-lander')}
+            >
+              🚀 Lunar Lander
+            </Button>
             <Button
               size="lg"
               variant="outline"
