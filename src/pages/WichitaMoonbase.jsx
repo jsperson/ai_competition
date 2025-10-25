@@ -17,7 +17,7 @@ export default function WichitaMoonbase() {
       width: 800,
       height: 600,
       parent: gameRef.current,
-      backgroundColor: '#000428',
+      backgroundColor: '#001f3f', // Kansas Navy Blue
       physics: {
         default: 'arcade',
         arcade: {
@@ -41,16 +41,17 @@ export default function WichitaMoonbase() {
     let gameOver = false;
     let gameWon = false;
 
-    // Game phases
-    let gamePhase = 'launch'; // launch, travel, defend, won
-    let phaseText;
+    // Game state
     let moonbase;
     let wichitaBuildings;
-    let distance = 0;
-    let distanceText;
+    let wave = 1;
+    let waveText;
     let asteroidsDestroyed = 0;
-    let health = 100;
-    let healthText;
+    let cityHealth = 100;
+    let cityHealthText;
+    let playerHealth = 100;
+    let playerHealthText;
+    let totalAsteroidsToDefeat = 50;
 
     // ========== CREATE ==========
     function create() {
@@ -60,43 +61,78 @@ export default function WichitaMoonbase() {
       // Background stars
       createStarfield.call(this);
 
+      // Evil Moonbase at top
+      moonbase = this.add.sprite(400, 80, 'moonbase');
+      moonbase.setScale(1.5);
+      moonbase.setTint(0xff4444); // Evil red tint
+
+      // Add ominous glow
+      const glow = this.add.circle(400, 80, 60, 0xff0000, 0.3);
+      this.tweens.add({
+        targets: glow,
+        alpha: 0.1,
+        duration: 1000,
+        yoyo: true,
+        repeat: -1
+      });
+
+      // Wichita city at bottom (to protect!)
+      createWichitaCity.call(this);
+
       // UI Elements
       scoreText = this.add.text(16, 16, 'Score: 0', {
         fontSize: '24px',
-        fill: '#fff',
-        stroke: '#000',
-        strokeThickness: 3
+        fill: '#FFD700', // Kansas Gold
+        stroke: '#001f3f',
+        strokeThickness: 3,
+        fontStyle: 'bold'
       });
 
-      distanceText = this.add.text(16, 50, 'Distance: 0 km', {
-        fontSize: '20px',
-        fill: '#0ff',
-        stroke: '#000',
-        strokeThickness: 3
-      });
+      waveText = this.add.text(400, 20, 'Wave: 1', {
+        fontSize: '28px',
+        fill: '#FFD700',
+        stroke: '#001f3f',
+        strokeThickness: 4,
+        fontStyle: 'bold'
+      }).setOrigin(0.5);
 
-      healthText = this.add.text(16, 80, 'Hull: 100%', {
+      cityHealthText = this.add.text(650, 16, 'City: 100%', {
         fontSize: '20px',
         fill: '#0f0',
-        stroke: '#000',
+        stroke: '#001f3f',
         strokeThickness: 3
       });
 
-      phaseText = this.add.text(400, 300, 'LAUNCHING FROM WICHITA', {
-        fontSize: '36px',
-        fill: '#ff0',
-        stroke: '#000',
+      playerHealthText = this.add.text(650, 45, 'Ship: 100%', {
+        fontSize: '20px',
+        fill: '#0ff',
+        stroke: '#001f3f',
+        strokeThickness: 3
+      });
+
+      // Warning message
+      const warningText = this.add.text(400, 250, 'ALERT: MOONBASE ATTACKING!', {
+        fontSize: '42px',
+        fill: '#ff0000',
+        stroke: '#FFD700',
         strokeThickness: 4,
-        align: 'center'
+        align: 'center',
+        fontStyle: 'bold'
       }).setOrigin(0.5).setDepth(100);
 
-      // Create Wichita cityscape at bottom
-      createWichitaCity.call(this);
+      this.tweens.add({
+        targets: warningText,
+        alpha: 0,
+        duration: 3000,
+        delay: 2000,
+        onComplete: () => warningText.destroy()
+      });
 
-      // Create player ship
-      player = this.physics.add.sprite(400, 500, 'player');
+      // Create player ship (defender of Wichita!)
+      player = this.physics.add.sprite(400, 450, 'player');
       player.setCollideWorldBounds(true);
       player.setDepth(50);
+      player.setTint(0xFFD700); // Kansas Gold
 
       // Bullets group
       bullets = this.physics.add.group({
@@ -104,7 +140,7 @@ export default function WichitaMoonbase() {
         maxSize: 30
       });
 
-      // Asteroids group
+      // Asteroids group (enemy projectiles from moonbase!)
       asteroids = this.physics.add.group();
 
       // Keyboard controls
@@ -114,19 +150,25 @@ export default function WichitaMoonbase() {
       // Collisions
       this.physics.add.overlap(bullets, asteroids, hitAsteroid, null, this);
       this.physics.add.overlap(player, asteroids, hitPlayer, null, this);
+      this.physics.add.overlap(wichitaBuildings, asteroids, asteroidHitsCity, null, this);
 
-      // Phase timer - launch phase lasts 3 seconds
-      this.time.delayedCall(3000, () => {
-        startTravelPhase.call(this);
+      // Start spawning asteroids from moonbase
+      this.time.addEvent({
+        delay: 1500,
+        callback: spawnAsteroidFromMoonbase,
+        callbackScope: this,
+        loop: true
       });
 
       // Instructions (fade out after 5 seconds)
-      const instructions = this.add.text(400, 500, 'Arrow Keys: Move | Space: Shoot', {
-        fontSize: '18px',
-        fill: '#fff',
-        backgroundColor: '#000',
-        padding: { x: 10, y: 5 }
-      }).setOrigin(0.5).setAlpha(0.8);
+      const instructions = this.add.text(400, 400, 'DEFEND WICHITA!\nArrow Keys: Move | Space: Shoot', {
+        fontSize: '20px',
+        fill: '#FFD700',
+        backgroundColor: '#001f3f',
+        padding: { x: 15, y: 10 },
+        align: 'center',
+        fontStyle: 'bold'
+      }).setOrigin(0.5).setAlpha(0.9);
 
       this.tweens.add({
         targets: instructions,
@@ -143,17 +185,17 @@ export default function WichitaMoonbase() {
 
       // Player movement
       if (cursors.left.isDown) {
-        player.setVelocityX(-300);
+        player.setVelocityX(-350);
       } else if (cursors.right.isDown) {
-        player.setVelocityX(300);
+        player.setVelocityX(350);
       } else {
         player.setVelocityX(0);
       }
 
       if (cursors.up.isDown) {
-        player.setVelocityY(-300);
+        player.setVelocityY(-350);
       } else if (cursors.down.isDown) {
-        player.setVelocityY(300);
+        player.setVelocityY(350);
       } else {
         player.setVelocityY(0);
       }
@@ -167,58 +209,58 @@ export default function WichitaMoonbase() {
         if (asteroid.y > 650) asteroid.destroy();
       });
 
-      // Update distance in travel phase
-      if (gamePhase === 'travel') {
-        distance += 0.5;
-        distanceText.setText('Distance: ' + Math.floor(distance) + ' km');
+      // Check win condition
+      if (asteroidsDestroyed >= totalAsteroidsToDefeat && !gameWon) {
+        winGame.call(this);
+      }
 
-        // Reach moonbase at 1000km
-        if (distance >= 1000) {
-          startDefendPhase.call(this);
-        }
+      // Pulse moonbase menacingly
+      if (moonbase) {
+        const scale = 1.5 + Math.sin(this.time.now * 0.002) * 0.1;
+        moonbase.setScale(scale);
       }
     }
 
     // ========== HELPER FUNCTIONS ==========
     function createTextures() {
-      // Player ship (triangle pointing up)
+      // Player ship (Kansas Gold defender)
       const graphics = this.add.graphics();
-      graphics.fillStyle(0x00ff00, 1);
+      graphics.fillStyle(0xFFD700, 1);
       graphics.beginPath();
       graphics.moveTo(15, 0);
       graphics.lineTo(0, 30);
       graphics.lineTo(30, 30);
       graphics.closePath();
       graphics.fillPath();
-      // Add exhaust
-      graphics.fillStyle(0xff6600, 1);
+      // Add Kansas blue exhaust
+      graphics.fillStyle(0x001f3f, 1);
       graphics.fillRect(12, 30, 6, 8);
       graphics.generateTexture('player', 30, 38);
       graphics.destroy();
 
-      // Bullet
+      // Bullet (gold)
       const bulletGraphics = this.add.graphics();
-      bulletGraphics.fillStyle(0xffff00, 1);
-      bulletGraphics.fillRect(0, 0, 4, 12);
-      bulletGraphics.generateTexture('bullet', 4, 12);
+      bulletGraphics.fillStyle(0xFFD700, 1);
+      bulletGraphics.fillRect(0, 0, 5, 15);
+      bulletGraphics.generateTexture('bullet', 5, 15);
       bulletGraphics.destroy();
 
-      // Asteroid
+      // Asteroid (moonbase weapon - darker, more menacing)
       const asteroidGraphics = this.add.graphics();
-      asteroidGraphics.fillStyle(0x8b4513, 1);
+      asteroidGraphics.fillStyle(0x8b0000, 1); // Dark red
       asteroidGraphics.fillCircle(20, 20, 20);
-      asteroidGraphics.fillStyle(0x654321, 1);
+      asteroidGraphics.fillStyle(0x4a0000, 1);
       asteroidGraphics.fillCircle(12, 15, 8);
       asteroidGraphics.fillCircle(25, 22, 6);
       asteroidGraphics.generateTexture('asteroid', 40, 40);
       asteroidGraphics.destroy();
 
-      // Wichita building
+      // Wichita building (Kansas colors)
       const buildingGraphics = this.add.graphics();
       buildingGraphics.fillStyle(0x555555, 1);
       buildingGraphics.fillRect(0, 0, 40, 80);
-      buildingGraphics.fillStyle(0xffff00, 0.8);
-      // Windows
+      // Gold windows
+      buildingGraphics.fillStyle(0xFFD700, 0.9);
       for (let i = 0; i < 3; i++) {
         for (let j = 0; j < 6; j++) {
           buildingGraphics.fillRect(5 + i * 12, 5 + j * 12, 8, 8);
@@ -227,46 +269,46 @@ export default function WichitaMoonbase() {
       buildingGraphics.generateTexture('building', 40, 80);
       buildingGraphics.destroy();
 
-      // Moonbase
+      // Evil Moonbase
       const moonbaseGraphics = this.add.graphics();
-      moonbaseGraphics.fillStyle(0xcccccc, 1);
+      moonbaseGraphics.fillStyle(0x444444, 1);
       moonbaseGraphics.fillCircle(40, 40, 40);
-      moonbaseGraphics.fillStyle(0x0088ff, 1);
-      moonbaseGraphics.fillCircle(40, 30, 15);
       moonbaseGraphics.fillStyle(0xff0000, 1);
+      moonbaseGraphics.fillCircle(40, 30, 15);
+      moonbaseGraphics.fillStyle(0x000000, 1);
       moonbaseGraphics.fillRect(35, 50, 10, 5);
       moonbaseGraphics.generateTexture('moonbase', 80, 80);
       moonbaseGraphics.destroy();
     }
 
     function createStarfield() {
-      for (let i = 0; i < 100; i++) {
+      for (let i = 0; i < 150; i++) {
         const x = Phaser.Math.Between(0, 800);
         const y = Phaser.Math.Between(0, 600);
-        const star = this.add.circle(x, y, 1, 0xffffff);
+        const star = this.add.circle(x, y, 1, 0xFFD700);
         star.setAlpha(Phaser.Math.FloatBetween(0.3, 1));
       }
     }
 
     function createWichitaCity() {
-      wichitaBuildings = this.add.group();
+      wichitaBuildings = this.physics.add.staticGroup();
 
-      // Create city text
+      // WICHITA text
       this.add.text(400, 520, 'WICHITA, KANSAS', {
-        fontSize: '24px',
-        fill: '#fff',
+        fontSize: '28px',
+        fill: '#FFD700',
         fontStyle: 'bold',
-        stroke: '#000',
-        strokeThickness: 4
-      }).setOrigin(0.5);
+        stroke: '#001f3f',
+        strokeThickness: 5
+      }).setOrigin(0.5).setDepth(100);
 
-      // Create buildings
+      // Create buildings with physics
       for (let i = 0; i < 15; i++) {
         const x = i * 60 + 20;
         const height = Phaser.Math.Between(60, 100);
-        const building = this.add.sprite(x, 600 - height/2, 'building');
+        const building = wichitaBuildings.create(x, 600 - height/2, 'building');
         building.setScale(1, height / 80);
-        wichitaBuildings.add(building);
+        building.refreshBody();
       }
     }
 
@@ -277,113 +319,67 @@ export default function WichitaMoonbase() {
       if (bullet) {
         bullet.setActive(true);
         bullet.setVisible(true);
-        bullet.body.velocity.y = -500;
+        bullet.body.velocity.y = -600;
+        bullet.setTint(0xFFD700);
       }
     }
 
-    function spawnAsteroid() {
+    function spawnAsteroidFromMoonbase() {
       if (gameOver || gameWon) return;
 
-      const x = Phaser.Math.Between(50, 750);
-      const asteroid = asteroids.create(x, -40, 'asteroid');
+      // Spawn from moonbase position
+      const x = Phaser.Math.Between(350, 450);
+      const asteroid = asteroids.create(x, 120, 'asteroid');
       asteroid.setVelocity(
-        Phaser.Math.Between(-50, 50),
-        Phaser.Math.Between(150, 300)
+        Phaser.Math.Between(-100, 100),
+        Phaser.Math.Between(100, 250)
       );
       asteroid.setAngularVelocity(Phaser.Math.Between(-100, 100));
-    }
-
-    function startTravelPhase() {
-      gamePhase = 'travel';
-      phaseText.setText('TRAVELING TO MOONBASE');
-
-      // Fade out Wichita buildings
-      this.tweens.add({
-        targets: wichitaBuildings.getChildren(),
-        y: '+=100',
-        alpha: 0,
-        duration: 2000
-      });
-
-      // Start spawning asteroids
-      this.time.addEvent({
-        delay: 1000,
-        callback: spawnAsteroid,
-        callbackScope: this,
-        loop: true
-      });
-
-      // Fade out phase text
-      this.time.delayedCall(2000, () => {
-        this.tweens.add({
-          targets: phaseText,
-          alpha: 0,
-          duration: 1000
-        });
-      });
-    }
-
-    function startDefendPhase() {
-      gamePhase = 'defend';
-      phaseText.setText('DEFEND THE MOONBASE!');
-      phaseText.setAlpha(1);
-
-      // Create moonbase at top
-      moonbase = this.add.sprite(400, 80, 'moonbase');
-      moonbase.setScale(1.5);
-
-      // Increase asteroid spawn rate
-      this.time.addEvent({
-        delay: 500,
-        callback: spawnAsteroid,
-        callbackScope: this,
-        loop: true,
-        repeat: 19 // 20 asteroids total
-      });
-
-      // Win condition: survive 20 asteroids
-      this.time.delayedCall(15000, () => {
-        if (!gameOver) {
-          winGame.call(this);
-        }
-      });
-
-      this.time.delayedCall(2000, () => {
-        this.tweens.add({
-          targets: phaseText,
-          alpha: 0,
-          duration: 1000
-        });
-      });
+      asteroid.setTint(0xff4444);
     }
 
     function hitAsteroid(bullet, asteroid) {
       bullet.destroy();
       asteroid.destroy();
-      score += 10;
+      score += 15;
       asteroidsDestroyed++;
       scoreText.setText('Score: ' + score);
 
-      // Explosion effect
-      const explosion = this.add.circle(asteroid.x, asteroid.y, 20, 0xff6600);
+      // Explosion effect (Kansas gold)
+      const explosion = this.add.circle(asteroid.x, asteroid.y, 25, 0xFFD700);
       this.tweens.add({
         targets: explosion,
-        scale: 2,
+        scale: 2.5,
         alpha: 0,
         duration: 300,
         onComplete: () => explosion.destroy()
       });
+
+      // Check for wave progression
+      if (asteroidsDestroyed % 10 === 0 && asteroidsDestroyed > 0) {
+        wave++;
+        waveText.setText('Wave: ' + wave);
+
+        // Flash wave text
+        this.tweens.add({
+          targets: waveText,
+          scale: 1.5,
+          duration: 200,
+          yoyo: true,
+          repeat: 2
+        });
+      }
     }
 
     function hitPlayer(player, asteroid) {
       asteroid.destroy();
-      health -= 20;
-      healthText.setText('Hull: ' + health + '%');
+      playerHealth -= 25;
+      playerHealthText.setText('Ship: ' + playerHealth + '%');
 
-      if (health <= 0) {
-        healthText.setColor('#f00');
-      } else if (health <= 40) {
-        healthText.setColor('#ff0');
+      if (playerHealth <= 0) {
+        playerHealthText.setColor('#f00');
+      } else if (playerHealth <= 40) {
+        playerHealthText.setColor('#ff0');
       }
 
       // Flash player
@@ -395,8 +391,43 @@ export default function WichitaMoonbase() {
         repeat: 2
       });
 
-      if (health <= 0) {
-        loseGame.call(this);
+      if (playerHealth <= 0) {
+        loseGame.call(this, 'SHIP DESTROYED!');
+      }
+    }
+
+    function asteroidHitsCity(building, asteroid) {
+      asteroid.destroy();
+      cityHealth -= 10;
+      cityHealthText.setText('City: ' + cityHealth + '%');
+
+      if (cityHealth <= 0) {
+        cityHealthText.setColor('#f00');
+      } else if (cityHealth <= 40) {
+        cityHealthText.setColor('#ff0');
+      }
+
+      // Flash building
+      this.tweens.add({
+        targets: building,
+        alpha: 0.5,
+        duration: 100,
+        yoyo: true,
+        repeat: 1
+      });
+
+      // Explosion on city
+      const explosion = this.add.circle(building.x, building.y, 30, 0xff0000);
+      this.tweens.add({
+        targets: explosion,
+        scale: 2,
+        alpha: 0,
+        duration: 400,
+        onComplete: () => explosion.destroy()
+      });
+
+      if (cityHealth <= 0) {
+        loseGame.call(this, 'WICHITA DESTROYED!');
       }
     }
 
@@ -404,14 +435,16 @@ export default function WichitaMoonbase() {
       gameWon = true;
       this.physics.pause();
 
-      this.add.text(400, 300, 'MISSION SUCCESS!\n\nMoonbase Defended!\nScore: ' + score + '\nAsteroids Destroyed: ' + asteroidsDestroyed + '\n\nClick to Restart', {
-        fontSize: '42px',
-        fill: '#0f0',
+      // Victory message
+      this.add.text(400, 250, 'WICHITA SAVED!\n\nMoonbase Defeated!\nScore: ' + score + '\nWaves Survived: ' + wave + '\n\nYou are a Kansas Hero!\n\nClick to Restart', {
+        fontSize: '40px',
+        fill: '#FFD700',
         align: 'center',
-        backgroundColor: '#000',
-        padding: { x: 20, y: 15 },
-        stroke: '#0f0',
-        strokeThickness: 3
+        backgroundColor: '#001f3f',
+        padding: { x: 25, y: 20 },
+        stroke: '#FFD700',
+        strokeThickness: 4,
+        fontStyle: 'bold'
       }).setOrigin(0.5);
 
       this.input.once('pointerdown', () => {
@@ -419,19 +452,20 @@ export default function WichitaMoonbase() {
       });
     }
 
-    function loseGame() {
+    function loseGame(message) {
       gameOver = true;
       player.setTint(0xff0000);
       this.physics.pause();
 
-      this.add.text(400, 300, 'MISSION FAILED\n\nShip Destroyed\nScore: ' + score + '\n\nClick to Retry', {
+      this.add.text(400, 250, message + '\n\nScore: ' + score + '\nWaves: ' + wave + '\n\nClick to Retry', {
         fontSize: '48px',
         fill: '#f00',
         align: 'center',
-        backgroundColor: '#000',
+        backgroundColor: '#001f3f',
         padding: { x: 20, y: 15 },
-        stroke: '#f00',
-        strokeThickness: 4
+        stroke: '#FFD700',
+        strokeThickness: 4,
+        fontStyle: 'bold'
       }).setOrigin(0.5);
 
       this.input.once('pointerdown', () => {
@@ -452,63 +486,66 @@ export default function WichitaMoonbase() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-black">
+    <div className="min-h-screen bg-gradient-to-br from-blue-950 via-blue-900 to-blue-950">
       {/* Header */}
-      <div className="bg-black/50 backdrop-blur-sm border-b border-white/20">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+      <div className="bg-blue-950/80 backdrop-blur-sm border-b border-yellow-500/30">
+        <div className="container mx-auto px-4 py-2 flex items-center justify-between">
           <Button
             variant="ghost"
-            className="text-white hover:bg-white/20"
+            className="text-yellow-400 hover:bg-yellow-400/20 border border-yellow-400/30 text-sm"
             onClick={() => navigate('/')}
           >
-            <ArrowLeft className="mr-2" size={20} />
+            <ArrowLeft className="mr-2" size={18} />
             Back to Home
           </Button>
-          <h1 className="text-2xl font-bold text-white">Wichita to the Moon</h1>
-          <div className="w-32" />
+          <h1 className="text-xl font-bold text-yellow-400">Defend Wichita</h1>
+          <div className="w-28" />
         </div>
       </div>
 
       {/* Game Container */}
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-4">
         <div className="max-w-4xl mx-auto">
           {/* Game Story */}
-          <div className="bg-gradient-to-r from-blue-900/50 to-purple-900/50 backdrop-blur-md rounded-lg p-6 mb-6 text-white border border-white/20">
-            <h2 className="text-2xl font-bold mb-3">Mission Briefing</h2>
-            <p className="mb-3 text-lg">
-              Launch from <span className="text-yellow-300 font-bold">Wichita, Kansas</span> and travel through space to defend our <span className="text-blue-300 font-bold">Moonbase</span> from incoming asteroids!
+          <div className="bg-gradient-to-r from-yellow-400/10 to-yellow-500/10 backdrop-blur-md rounded-lg p-4 mb-3 text-yellow-100 border-2 border-yellow-500/50">
+            <h2 className="text-xl font-bold mb-2 text-yellow-400">Mission Briefing</h2>
+            <p className="mb-2 text-base">
+              <span className="text-red-400 font-bold">⚠ ALERT!</span> The rogue <span className="text-red-400 font-bold">Moonbase</span> is launching asteroids at <span className="text-yellow-300 font-bold">Wichita, Kansas</span>!
             </p>
-            <div className="grid md:grid-cols-3 gap-4 text-center mt-4">
+            <p className="mb-2 text-base">
+              As the city's defender, you must <span className="text-yellow-300 font-bold">shoot down the asteroids</span> before they destroy our home!
+            </p>
+            <div className="grid md:grid-cols-3 gap-3 text-center mt-3">
               <div>
-                <p className="text-3xl mb-2">🚀</p>
-                <p className="text-sm">Launch from Wichita</p>
+                <p className="text-2xl mb-1">🏙️</p>
+                <p className="text-xs text-yellow-400 font-bold">Protect Wichita</p>
               </div>
               <div>
-                <p className="text-3xl mb-2">🌌</p>
-                <p className="text-sm">Travel 1000km</p>
+                <p className="text-2xl mb-1">🔫</p>
+                <p className="text-xs text-yellow-400 font-bold">Destroy Asteroids</p>
               </div>
               <div>
-                <p className="text-3xl mb-2">🌙</p>
-                <p className="text-sm">Defend Moonbase</p>
+                <p className="text-2xl mb-1">🌙</p>
+                <p className="text-xs text-yellow-400 font-bold">Defeat Moonbase</p>
               </div>
             </div>
           </div>
 
           {/* Controls */}
-          <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 mb-6 text-white border border-white/20">
-            <h2 className="text-2xl font-bold mb-3">How to Play</h2>
-            <div className="grid md:grid-cols-3 gap-4 text-center">
+          <div className="bg-blue-900/50 backdrop-blur-md rounded-lg p-4 mb-3 text-yellow-100 border-2 border-yellow-500/30">
+            <h2 className="text-xl font-bold mb-2 text-yellow-400">How to Play</h2>
+            <div className="grid md:grid-cols-3 gap-3 text-center">
               <div>
-                <p className="text-3xl mb-2">⬅️ ➡️ ⬆️ ⬇️</p>
-                <p className="text-sm">Arrow Keys to Move</p>
+                <p className="text-2xl mb-1">⬅️ ➡️ ⬆️ ⬇️</p>
+                <p className="text-xs text-yellow-400 font-bold">Arrow Keys to Move</p>
               </div>
               <div>
-                <p className="text-3xl mb-2">⎵</p>
-                <p className="text-sm">Space to Shoot</p>
+                <p className="text-2xl mb-1">⎵</p>
+                <p className="text-xs text-yellow-400 font-bold">Space to Shoot</p>
               </div>
               <div>
-                <p className="text-3xl mb-2">💥</p>
-                <p className="text-sm">Destroy Asteroids</p>
+                <p className="text-2xl mb-1">💥</p>
+                <p className="text-xs text-yellow-400 font-bold">Stop 50 Asteroids to Win!</p>
               </div>
             </div>
           </div>
@@ -517,17 +554,20 @@ export default function WichitaMoonbase() {
           <div className="flex justify-center">
             <div
               ref={gameRef}
-              className="border-4 border-yellow-400/50 rounded-lg shadow-2xl shadow-purple-500/50"
+              className="border-4 border-yellow-400/60 rounded-lg shadow-2xl shadow-yellow-500/30"
               style={{ width: '800px', height: '600px' }}
             />
           </div>
 
           {/* Game Info */}
-          <div className="mt-6 text-center text-white/80">
-            <p className="text-sm mb-2">
+          <div className="mt-3 text-center text-yellow-400">
+            <p className="text-xs mb-1 font-bold">
               AI Prompt Championship - Wichita Regional - Challenge #2
             </p>
-            <p className="text-xs">
+            <p className="text-xs text-yellow-500">
+              Defend Kansas with Navy Blue Pride and Gold Determination!
+            </p>
+            <p className="text-xs text-blue-300 mt-1">
               Built with Phaser 3 + React + Vite • Deployed on Vercel
             </p>
           </div>
