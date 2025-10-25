@@ -174,21 +174,73 @@ export default function LunarLander() {
 
     // ========== TEXTURE CREATION ==========
     function createTextures() {
-      // Lander (triangle shape)
+      // Lunar Lander (Apollo LM style)
       const landerGraphics = this.add.graphics();
+
+      // Descent Stage (bottom box)
+      landerGraphics.fillStyle(0xCCCCCC, 1);
+      landerGraphics.fillRect(20, 35, 40, 20);
+
+      // Ascent Stage (cabin - octagonal)
       landerGraphics.fillStyle(0xFFFFFF, 1);
       landerGraphics.beginPath();
-      landerGraphics.moveTo(20, 5);
-      landerGraphics.lineTo(5, 35);
+      landerGraphics.moveTo(40, 15);
+      landerGraphics.lineTo(50, 20);
+      landerGraphics.lineTo(50, 30);
+      landerGraphics.lineTo(45, 35);
       landerGraphics.lineTo(35, 35);
+      landerGraphics.lineTo(30, 30);
+      landerGraphics.lineTo(30, 20);
+      landerGraphics.lineTo(40, 15);
       landerGraphics.closePath();
       landerGraphics.fillPath();
-      // Landing legs
-      landerGraphics.lineStyle(3, 0xFFFFFF);
-      landerGraphics.lineTo(0, 40);
-      landerGraphics.moveTo(35, 35);
-      landerGraphics.lineTo(40, 40);
-      landerGraphics.generateTexture('lander', 40, 40);
+
+      // Window
+      landerGraphics.fillStyle(0x4444FF, 1);
+      landerGraphics.fillRect(36, 22, 8, 8);
+
+      // RCS thrusters (small boxes on sides)
+      landerGraphics.fillStyle(0x888888, 1);
+      landerGraphics.fillRect(25, 38, 4, 4);
+      landerGraphics.fillRect(51, 38, 4, 4);
+
+      // Landing Legs (4 legs)
+      landerGraphics.lineStyle(3, 0xAAAAAA);
+
+      // Front left leg
+      landerGraphics.beginPath();
+      landerGraphics.moveTo(25, 50);
+      landerGraphics.lineTo(10, 65);
+      landerGraphics.strokePath();
+      landerGraphics.fillStyle(0xAAAAAA, 1);
+      landerGraphics.fillRect(8, 65, 6, 3); // foot pad
+
+      // Front right leg
+      landerGraphics.beginPath();
+      landerGraphics.moveTo(55, 50);
+      landerGraphics.lineTo(70, 65);
+      landerGraphics.strokePath();
+      landerGraphics.fillRect(68, 65, 6, 3); // foot pad
+
+      // Back left leg
+      landerGraphics.beginPath();
+      landerGraphics.moveTo(28, 52);
+      landerGraphics.lineTo(15, 68);
+      landerGraphics.strokePath();
+      landerGraphics.fillRect(13, 68, 6, 3); // foot pad
+
+      // Back right leg
+      landerGraphics.beginPath();
+      landerGraphics.moveTo(52, 52);
+      landerGraphics.lineTo(65, 68);
+      landerGraphics.strokePath();
+      landerGraphics.fillRect(63, 68, 6, 3); // foot pad
+
+      // Main thruster nozzle
+      landerGraphics.fillStyle(0x666666, 1);
+      landerGraphics.fillRect(37, 55, 6, 8);
+
+      landerGraphics.generateTexture('lander', 80, 75);
       landerGraphics.destroy();
 
       // Particle for thrust
@@ -341,7 +393,7 @@ export default function LunarLander() {
 
       // Thrust particles
       if (thrusting && fuel > 0) {
-        thrustParticles.emitParticleAt(lander.x, lander.y + 15);
+        thrustParticles.emitParticleAt(lander.x, lander.y + 35);
       }
 
       // Fuel warnings
