@@ -35,6 +35,8 @@ This project has **Context7 MCP** configured for real-time documentation access.
 - **Routing**: React Router v6
 - **Icons**: Lucide React (included with shadcn)
 - **State**: React hooks + localStorage
+- **Game Engine**: Phaser 3 (HTML5 game framework)
+- **Documentation**: Context7 MCP (13,687+ Phaser code snippets)
 - **Deployment**: Vercel
 
 ---
@@ -79,6 +81,9 @@ npx shadcn-ui@latest add separator
 
 # Install routing
 npm install react-router-dom
+
+# Install Phaser 3 (for game development)
+npm install phaser
 ```
 
 ### **Configuration Files:**
@@ -725,6 +730,225 @@ export default function ConfirmDialog({ onConfirm }) {
   );
 }
 ```
+
+---
+
+## PHASE 3C: GAME DEVELOPMENT WITH PHASER 3
+
+### **🎮 When to Use This Section:**
+- Building web-based games
+- Interactive playable experiences
+- Game mechanics (physics, collisions, scoring)
+- Arcade/action/puzzle games
+
+### **Quick Start - Game Development:**
+
+**1. Install Phaser (if not already installed):**
+```bash
+npm install phaser
+```
+
+**2. Use the Game Template:**
+```bash
+cp src/pages/GameTemplate.jsx src/pages/MyGame.jsx
+```
+
+**3. Import Game Helpers:**
+```javascript
+import {
+  createPlayer,
+  createSimpleTexture,
+  createCircleTexture,
+  shootBullet,
+  spawnRandomEnemy,
+  moveWithArrowKeys
+} from '@/utils/gameHelpers';
+```
+
+**4. Access Phaser Documentation via Context7:**
+Ask Claude: "Show me Phaser examples for [feature]"
+- 13,687+ code snippets available
+- Sprite physics, animations, tilemaps, particles
+- Real-time documentation lookup
+
+### **Game Development Resources:**
+
+**Available Files:**
+- `src/pages/Game.jsx` - Working Space Shooter example
+- `src/pages/GameTemplate.jsx` - Copy-paste starter
+- `src/utils/gameHelpers.js` - 20+ utility functions
+- `GAME_DEV_GUIDE.md` - Comprehensive documentation
+
+**Pre-Built Utilities (gameHelpers.js):**
+```javascript
+// Texture Creation
+createSimpleTexture(scene, 'player', 0x00ff00, 32, 32);
+createCircleTexture(scene, 'enemy', 0xff0000, 16);
+createTriangleTexture(scene, 'ship', 0x0000ff, 30, 40);
+
+// Player Setup
+const player = createPlayer(scene, 400, 300, 'player');
+const cursors = setupKeyboardControls(scene);
+
+// Movement
+moveWithArrowKeys(player, cursors, 300);           // 360° movement
+platformMovement(player, cursors, 200, -400);      // Platform controls
+
+// Groups & Pooling
+const bullets = createBulletGroup(scene, 'bullet', 20);
+const enemies = createEnemyGroup(scene, 'enemy', 10);
+
+// Shooting
+shootBullet(bullets, player, 0, -20, 0, -400);
+
+// Spawning
+spawnRandomEnemy(enemies, 800, 100, 200);
+createSpawnTimer(scene, 1000, spawnCallback, true);
+
+// UI
+const scoreText = createScoreText(scene, 16, 16, 'Score: 0');
+updateScore(scoreText, score, 'Score: ');
+showGameOver(scene, finalScore, restartCallback);
+```
+
+### **Common Game Patterns (15-30 minutes each):**
+
+#### **Pattern A: Space Shooter**
+```javascript
+// In create()
+createSimpleTexture(this, 'player', 0x00ff00, 30, 40);
+createCircleTexture(this, 'bullet', 0xffff00, 4);
+createSimpleTexture(this, 'enemy', 0xff0000, 30, 30);
+
+const player = createPlayer(this, 400, 500, 'player');
+const bullets = createBulletGroup(this, 'bullet', 20);
+const enemies = createEnemyGroup(this, 'enemy', 10);
+
+createSpawnTimer(this, 1000, () => {
+  spawnRandomEnemy(enemies, 800, 100, 200);
+});
+
+this.input.keyboard.on('keydown-SPACE', () => {
+  shootBullet(bullets, player, 0, -20, 0, -400);
+});
+
+this.physics.add.overlap(bullets, enemies, (bullet, enemy) => {
+  bullet.destroy();
+  enemy.destroy();
+  score += 10;
+  updateScore(scoreText, score);
+});
+
+// In update()
+moveWithArrowKeys(player, cursors, 300);
+cleanupOffscreenSprites(bullets, 600, 800);
+```
+
+#### **Pattern B: Platformer**
+```javascript
+// In config - add gravity
+physics: {
+  default: 'arcade',
+  arcade: {
+    gravity: { y: 500 },
+    debug: false
+  }
+}
+
+// In create()
+const player = createPlayer(this, 100, 100, 'player');
+const platforms = this.physics.add.staticGroup();
+platforms.create(400, 568, 'ground');
+
+this.physics.add.collider(player, platforms);
+
+// In update()
+platformMovement(player, cursors, 200, -400);
+```
+
+#### **Pattern C: Endless Runner**
+```javascript
+// In create()
+let speed = 200;
+const obstacles = this.physics.add.group();
+
+createSpawnTimer(this, 1500, () => {
+  const obstacle = obstacles.create(800, 500, 'obstacle');
+  obstacle.setVelocityX(-speed);
+});
+
+this.physics.add.overlap(player, obstacles, () => {
+  showGameOver(this, score, () => this.scene.restart());
+});
+
+// In update()
+speed += 0.05; // Increase difficulty
+```
+
+### **Game Development Workflow (Phaser):**
+
+**Step 1: Design (5 min)**
+- What's the core mechanic? (shoot, jump, collect, avoid)
+- Top-down or side-view?
+- Win/lose conditions?
+
+**Step 2: Setup (5 min)**
+```bash
+cp src/pages/GameTemplate.jsx src/pages/MyGame.jsx
+# Add route in App.jsx
+```
+
+**Step 3: Build Incrementally (20-60 min)**
+1. Create textures (use helpers or graphics)
+2. Add player sprite
+3. Implement controls
+4. Add ONE game mechanic
+5. Test
+6. Add scoring/UI
+7. Add game over condition
+8. Polish
+
+**Step 4: Use Context7 for Advanced Features**
+Ask Claude:
+- "Show me Phaser sprite animation examples"
+- "How do I create a tilemap in Phaser?"
+- "Help me add particle effects"
+- "Show me Phaser camera controls"
+
+**Step 5: Deploy**
+```bash
+git add .
+git commit -m "feat: Add [game name]"
+git push
+```
+
+### **Time-Saving Tips:**
+
+1. **Use gameHelpers.js** - Don't write common functions from scratch
+2. **Copy patterns** - Adapt Space Shooter example to your needs
+3. **Simple graphics first** - Use colored shapes, add art later
+4. **Test constantly** - Run game after each feature
+5. **Ask for help** - Use Context7 for Phaser docs
+6. **Start simple** - Get one mechanic working, then expand
+
+### **Context7 Phaser Documentation:**
+
+Available topics (ask Claude for examples):
+- Sprite creation and physics
+- Arcade physics system
+- Collision detection
+- Animations and tweens
+- Particle effects
+- Tilemaps
+- Camera controls
+- Input handling
+- Audio/sound effects
+- Game state management
+
+**Example queries:**
+- "Show me how to create sprite animations in Phaser"
+- "Help me implement tilemap collisions"
+- "How do I add particle effects in Phaser?"
 
 ---
 
