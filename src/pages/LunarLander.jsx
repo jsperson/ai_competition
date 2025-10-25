@@ -109,12 +109,13 @@ export default function LunarLander() {
         fontStyle: 'bold'
       }).setOrigin(0.5);
 
-      // Ground collision body (invisible, covers entire bottom except blue dome)
+      // Ground collision body (invisible, covers entire bottom except landing pad area)
+      // Landing pad is at x=240, width=50 (spans 215-265)
       ground = this.physics.add.staticGroup();
-      // Left side of ground (before dome)
-      ground.create(75, 580, null).setSize(150, 40).setVisible(false);
-      // Right side of ground (after dome)
-      ground.create(500, 580, null).setSize(600, 40).setVisible(false);
+      // Left side of ground (x=0 to x=215)
+      ground.create(107, 580, null).setSize(214, 40).setVisible(false);
+      // Right side of ground (x=265 to x=800)
+      ground.create(532, 580, null).setSize(534, 40).setVisible(false);
 
       // Lander starting position (randomized across top)
       const startX = Phaser.Math.Between(100, 700);
@@ -126,8 +127,8 @@ export default function LunarLander() {
       lander.setDrag(0.05); // Light drag for realistic space physics
       lander.setMaxVelocity(800, 800); // Allow high speeds
 
-      // Lander collision
-      this.physics.add.overlap(lander, landingPad, checkLanding, null, this);
+      // Lander collision - landing pad first, then ground
+      this.physics.add.collider(lander, landingPad, checkLanding, null, this);
       this.physics.add.collider(lander, ground, crashOnGround, null, this);
 
       // Thrust particles
