@@ -733,7 +733,38 @@ export default function ConfirmDialog({ onConfirm }) {
 ### **📋 PASTE YOUR ACTUAL CHALLENGE HERE:**
 
 ```
-???[COMPETITION CHALLENGE GOES HERE]???
+Challenge #2
+
+  AI Prompt ChampionshipWichita Regional
+
+  Task:
+
+  You are a new video game team starting a small video game, the objective is to create a
+   fun and engaging game that highlights Wichita.
+
+  Core Required Features
+
+  1. The city of Wichita must be included the game
+  2. A Moonbase must be included the game
+  3. The design must incorporate a fully interactive, playable game with a beginning and
+  an end.
+
+  Deliverables
+
+  1. A publicly accessible demo site.
+  2. Provide instructions on how to play
+  3. Technical walkthrough of the implementation.
+
+  Challenge Opportunity
+
+  Create a CPU or NPC that uses agents to interact with the player and add another
+  dynamic level to the game.
+
+  ---
+  This appears to be a game development challenge for an AI competition in Wichita,
+  requiring participants to build a video game that features both Wichita and a Moonbase,
+   with optional AI agent integration for NPCs.
+
 ```
 
 ---
