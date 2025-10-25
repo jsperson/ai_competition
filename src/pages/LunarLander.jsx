@@ -47,6 +47,8 @@ export default function LunarLander() {
     let thrustParticles;
     let fuelWarning = false;
     let ground;
+    let padX;
+    let padY;
 
     // ========== PRELOAD ==========
     function preload() {
@@ -95,12 +97,15 @@ export default function LunarLander() {
       }).setOrigin(0.5);
 
       // Landing pad (on blue dome - Century 2)
-      const padX = 240;
-      const padY = 565;
+      padX = 240;
+      padY = 565;
       const padWidth = 50;
 
       landingPad = this.add.rectangle(padX, padY, padWidth, 10, 0xFFD700);
       this.physics.add.existing(landingPad, true);
+
+      console.log('Landing pad physics body:', landingPad.body);
+      console.log('Landing pad bounds:', landingPad.getBounds());
 
       // Landing pad markers
       this.add.text(padX, padY + 15, '🎯 LANDING ZONE', {
@@ -110,12 +115,16 @@ export default function LunarLander() {
       }).setOrigin(0.5);
 
       // Ground collision body (invisible, covers entire bottom except landing pad area)
-      // Landing pad is at x=240, width=50 (spans 215-265)
+      // Landing pad is at x=240, width=50 (spans 215-265), y=565, height=10 (spans 560-570)
+      // Ground must be BELOW the landing pad to avoid overlap
       ground = this.physics.add.staticGroup();
-      // Left side of ground (x=0 to x=215)
-      ground.create(107, 580, null).setSize(214, 40).setVisible(false);
-      // Right side of ground (x=265 to x=800)
-      ground.create(532, 580, null).setSize(534, 40).setVisible(false);
+      // Left side of ground (x=0 to x=215, below landing pad)
+      const leftGround = ground.create(107, 590, null).setSize(214, 20).setVisible(false);
+      // Right side of ground (x=265 to x=800, below landing pad)
+      const rightGround = ground.create(532, 590, null).setSize(534, 20).setVisible(false);
+
+      console.log('Left ground bounds:', leftGround.getBounds());
+      console.log('Right ground bounds:', rightGround.getBounds());
 
       // Lander starting position (randomized across top)
       const startX = Phaser.Math.Between(100, 700);
@@ -128,8 +137,11 @@ export default function LunarLander() {
       lander.setMaxVelocity(800, 800); // Allow high speeds
 
       // Lander collision - landing pad first, then ground
-      this.physics.add.collider(lander, landingPad, checkLanding, null, this);
-      this.physics.add.collider(lander, ground, crashOnGround, null, this);
+      const padCollider = this.physics.add.collider(lander, landingPad, checkLanding, null, this);
+      const groundCollider = this.physics.add.collider(lander, ground, crashOnGround, null, this);
+
+      console.log('Landing pad created at:', padX, padY, 'width:', padWidth);
+      console.log('Colliders registered - Pad:', padCollider, 'Ground:', groundCollider);
 
       // Thrust particles
       thrustParticles = this.add.particles(0, 0, 'particle', {
@@ -467,6 +479,7 @@ export default function LunarLander() {
         lander.body.velocity.x ** 2 + lander.body.velocity.y ** 2
       );
 
+      console.log('Ground collision! Lander position:', lander.x, lander.y, 'Speed:', speed);
       crashLander.call(this, 'CRASHED INTO GROUND!\nSpeed: ' + Math.round(speed));
     }
 

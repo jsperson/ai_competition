@@ -13,13 +13,10 @@ export default function Home() {
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <h1 className="text-2xl font-bold text-yellow-400">Kansas Web Games</h1>
           <div className="flex gap-2">
-            <Button variant="ghost" className="text-yellow-400 hover:bg-yellow-400/20 border border-yellow-400/30 text-sm" onClick={() => navigate('/game')}>
-              Space Shooter
-            </Button>
-            <Button variant="ghost" className="text-yellow-400 hover:bg-yellow-400/20 border border-yellow-400/30 text-sm" onClick={() => navigate('/lunar-lander')}>
+            <Button className="bg-yellow-400 text-blue-950 hover:bg-yellow-300 font-bold text-sm" onClick={() => navigate('/lunar-lander')}>
               🚀 Lunar Lander
             </Button>
-            <Button className="bg-yellow-400 text-blue-950 hover:bg-yellow-300 font-bold text-sm" onClick={() => navigate('/wichita-moonbase')}>
+            <Button variant="ghost" className="text-yellow-400 hover:bg-yellow-400/20 border border-yellow-400/30 text-sm" onClick={() => navigate('/wichita-moonbase')}>
               🛡️ Defend Wichita
             </Button>
           </div>
@@ -39,9 +36,9 @@ export default function Home() {
             <Button
               size="lg"
               className="bg-yellow-400 text-blue-950 hover:bg-yellow-300 text-lg px-8 py-4 font-bold"
-              onClick={() => navigate('/wichita-moonbase')}
+              onClick={() => navigate('/lunar-lander')}
             >
-              Play: Defend Wichita 🛡️🏙️
+              Play: Moon to Wichita Lander 🚀🌙
             </Button>
           </div>
 
@@ -55,20 +52,19 @@ export default function Home() {
           <div className="flex gap-4 justify-center">
             <Button
               size="lg"
-              variant="outline"
-              className="bg-yellow-400/10 text-yellow-400 border-yellow-400/50 hover:bg-yellow-400/20 text-base px-6 py-3"
+              className="bg-yellow-400 text-blue-950 hover:bg-yellow-300 font-bold text-lg px-8 py-4"
               onClick={() => navigate('/lunar-lander')}
             >
-              🚀 Lunar Lander
+              🚀 Moon to Wichita Lander
+              <Rocket className="ml-2" size={20} />
             </Button>
             <Button
               size="lg"
               variant="outline"
               className="bg-yellow-400/10 text-yellow-400 border-yellow-400/50 hover:bg-yellow-400/20 text-base px-6 py-3"
-              onClick={() => navigate('/game')}
+              onClick={() => navigate('/wichita-moonbase')}
             >
-              Space Shooter Demo
-              <Rocket className="ml-2" size={18} />
+              🛡️ Defend Wichita
             </Button>
           </div>
         </div>
