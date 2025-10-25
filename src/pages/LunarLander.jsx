@@ -81,7 +81,7 @@ export default function LunarLander() {
       lander.setScale(1.2);
       lander.setCollideWorldBounds(true);
       lander.setDamping(true);
-      lander.setDrag(0.99);
+      lander.setDrag(0.05); // Light drag for realistic space physics
 
       // Lander collision
       this.physics.add.overlap(lander, landingPad, checkLanding, null, this);
@@ -298,26 +298,26 @@ export default function LunarLander() {
       let thrusting = false;
 
       if (cursors.up.isDown && fuel > 0) {
-        lander.setVelocityY(lander.body.velocity.y - 3);
-        fuel -= 0.4;
+        lander.setVelocityY(lander.body.velocity.y - 5);
+        fuel -= 0.3;
         thrusting = true;
       }
 
       if (cursors.left.isDown && fuel > 0) {
-        lander.setVelocityX(lander.body.velocity.x - 2);
-        fuel -= 0.2;
+        lander.setVelocityX(lander.body.velocity.x - 4);
+        fuel -= 0.15;
         thrusting = true;
       }
 
       if (cursors.right.isDown && fuel > 0) {
-        lander.setVelocityX(lander.body.velocity.x + 2);
-        fuel -= 0.2;
+        lander.setVelocityX(lander.body.velocity.x + 4);
+        fuel -= 0.15;
         thrusting = true;
       }
 
       if (cursors.down.isDown && fuel > 0) {
-        lander.setVelocityY(lander.body.velocity.y + 2);
-        fuel -= 0.2;
+        lander.setVelocityY(lander.body.velocity.y + 3);
+        fuel -= 0.15;
         thrusting = true;
       }
 
