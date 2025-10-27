@@ -4,6 +4,8 @@
 
 A collection of interactive web games built with Phaser 3, React, and Vite, featuring iconic Wichita landmarks and Kansas-themed design.
 
+**🏆 Second Place Winner** - Game Challenge at the First Wichita Regional AI Competition (October 25, 2024)
+
 ## 🤖 Built with AI-First Development
 
 This entire project was developed using **agentic development** with [Claude Code](https://claude.com/claude-code) in approximately **one hour**. Starting with a search about how to do game development, Claude autonomously:
