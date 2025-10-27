@@ -387,3 +387,14 @@ npm run build
 **🏛️ Featuring Wichita's Iconic Landmarks**
 
 **⚡ Powered by Kansas Pride - Navy Blue & Gold**
+
+---
+
+## 🔗 Related Repositories
+
+This submission was part of a complete competition portfolio:
+
+- **[challenge-1](https://github.com/jsperson/challenge-1)** - Architect Track: LaunchKS platform (workforce development app)
+- **[ai_competition_oracle](https://github.com/jsperson/ai_competition_oracle)** - Oracle Track (Winner): Business plan and market research
+- **[ai_competition_2](https://github.com/jsperson/ai_competition_2)** - Challenge #4: Punchcard decoder
+- **ai_competition** (this repo) - Muse Track (2nd Place): Kansas web games
