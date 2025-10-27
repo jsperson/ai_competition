@@ -4,6 +4,19 @@
 
 A collection of interactive web games built with Phaser 3, React, and Vite, featuring iconic Wichita landmarks and Kansas-themed design.
 
+## 🤖 Built with AI-First Development
+
+This entire project was developed using **agentic development** with [Claude Code](https://claude.com/claude-code) in approximately **one hour**. Starting from a simple search for game development MCP guidance, Claude autonomously:
+
+- Researched Phaser 3 documentation via Context7 MCP server
+- Architected the React + Phaser integration
+- Built two complete games with physics, particle effects, and scoring
+- Created reusable game development utilities
+- Implemented Kansas-themed UI with shadcn components
+- Deployed to Vercel with auto-deployment
+
+This demonstrates the power of agentic AI development for rapid prototyping and competition-style development.
+
 ## 🎮 Featured Games
 
 ### 1. Defend Wichita 🛡️
