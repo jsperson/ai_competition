@@ -6,7 +6,7 @@ A collection of interactive web games built with Phaser 3, React, and Vite, feat
 
 ## 🤖 Built with AI-First Development
 
-This entire project was developed using **agentic development** with [Claude Code](https://claude.com/claude-code) in approximately **one hour**. Starting from a simple search for game development MCP guidance, Claude autonomously:
+This entire project was developed using **agentic development** with [Claude Code](https://claude.com/claude-code) in approximately **one hour**. Starting with a search about how to do game development, Claude autonomously:
 
 - Researched Phaser 3 documentation via Context7 MCP server
 - Architected the React + Phaser integration
